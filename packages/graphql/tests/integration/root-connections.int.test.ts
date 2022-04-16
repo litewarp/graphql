@@ -174,4 +174,95 @@ describe("root-connections", () => {
             await session.close();
         }
     });
+    test("should correctly produce edges when sort and limit are used", async () => {
+        const session = driver.session();
+
+        const pilotType = generateUniqueType("Pilot");
+        const aircraftType = generateUniqueType("Aircraft");
+
+        const typeDefs = `
+        type ${pilotType.name} {
+          name: String
+          aircraft: [${aircraftType.name}!]! @relationship(type: "FLIES_IN", direction: IN)
+        }
+
+        type ${aircraftType.name} {
+          id: ID!
+          name: String!
+          pilots: [${pilotType.name}!]! @relationship(type: "FLIES_IN", direction: OUT)
+        }
+  `;
+
+        const neoSchema = new Neo4jGraphQL({ typeDefs, driver });
+
+        const dummyAircrafts = [...Array(20).keys()].map((x) => ({
+            id: generate({ charset: "alphabetic " }),
+            name: generate({ charset: "alphabetic" }),
+        }));
+
+        const sortedAircrafts = dummyAircrafts.sort((a, b) => {
+            if (a.name < b.name) return -1;
+            if (a.name > b.name) return 1;
+            return 0;
+        });
+
+        const query = `
+        query {
+          ${aircraftType.operations.connection}(first: 10, sort: [{ name: ASC }]) {
+            totalCount
+            edges {
+              cursor
+              node {
+                id
+                name
+              }
+            }
+          }
+        }
+    `;
+
+        const create = `
+      mutation($input: [${aircraftType.name}CreateInput!]!) {
+        ${aircraftType.operations.create}(input: $input) {
+        ${aircraftType.plural} {
+            id
+          }
+        }
+      }
+    `;
+
+        try {
+            await neoSchema.checkNeo4jCompat();
+
+            await graphql({
+                schema: await neoSchema.getSchema(),
+                source: create,
+                variableValues: { input: dummyAircrafts },
+                contextValue: { driver, driverConfig: { bookmarks: session.lastBookmark() } },
+            });
+
+            const result = await graphql({
+                schema: await neoSchema.getSchema(),
+                source: query,
+                variableValues: {},
+                contextValue: { driver, driverConfig: { bookmarks: session.lastBookmark() } },
+            });
+
+            expect(result.errors).toBeFalsy();
+            expect(result?.data?.[aircraftType.operations.connection]).toEqual({
+                totalCount: 20,
+                edges: sortedAircrafts.slice(0, 10).map((node) => ({
+                    cursor: expect.any(String),
+                    node,
+                })),
+            });
+        } finally {
+            await session.run(`
+            MATCH (a:${aircraftType.name})
+            DETACH DELETE a
+          `);
+
+            await session.close();
+        }
+    });
 });
