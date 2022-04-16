@@ -47,7 +47,6 @@ export default function rootConnectionResolver({ node, composer }: { node: Node;
             context,
         });
 
-        let first: number | undefined;
         let totalCount = 0;
         let edges: any[] = [];
         let pageInfo: PageInfo = {
@@ -62,14 +61,10 @@ export default function rootConnectionResolver({ node, composer }: { node: Node;
 
             totalCount = isNeoInt(record.totalCount) ? record.totalCount.toNumber() : record.totalCount;
 
-            if (args.first) {
-                first = isNeoInt(args.first) ? args.first.toNumber() : args.first;
-            }
-
             const connection = createConnectionWithEdgeProperties({
                 selectionSet: resolveTree,
                 source: { edges: record.edges },
-                args: { first, after: args.after },
+                args: { first: args.first, after: args.after },
                 totalCount,
             });
 
