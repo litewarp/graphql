@@ -195,15 +195,33 @@ function translateRead({
     let cypher: string[] = [];
 
     if (isRootConnectionField) {
-        returnStrs.push(`WITH COLLECT({ node: ${varName} ${projStr} }) as edges`);
-        returnStrs.push(`RETURN { edges: edges, totalCount: size(edges) } as ${varName}`);
+        returnStrs.push(`WITH COLLECT({ node: ${varName} ${projStr} }) as edges, totalCount`);
+        returnStrs.push(`RETURN { edges: edges, totalCount: totalCount } as ${varName}`);
     } else {
         returnStrs.push(`RETURN ${varName} ${projStr} as ${varName}`);
     }
 
     const projectCypherFieldsAfterLimit = node.cypherFields.length && hasLimit && !cypherSort;
 
-    if (projectCypherFieldsAfterLimit) {
+    if (isRootConnectionField) {
+        cypher = [
+            "CALL {",
+            matchAndWhereStr,
+            authStr,
+            ...(projAuth ? [`WITH ${varName}`, projAuth] : []),
+            "WITH COLLECT(this) as edges",
+            "WITH edges, size(edges) as totalCount",
+            "UNWIND edges as this",
+            "RETURN this, totalCount",
+            ...(sortStr ? [sortStr] : []),
+            ...(offsetStr ? [offsetStr] : []),
+            ...(limitStr ? [limitStr] : []),
+            "}",
+            ...connectionStrs,
+            ...interfaceStrs,
+            ...returnStrs,
+        ];
+    } else if (projectCypherFieldsAfterLimit) {
         cypher = [
             "CALL {",
             matchAndWhereStr,
