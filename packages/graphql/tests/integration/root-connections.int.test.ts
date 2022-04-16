@@ -196,8 +196,8 @@ describe("root-connections", () => {
         const neoSchema = new Neo4jGraphQL({ typeDefs, driver });
 
         const dummyAircrafts = [...Array(20).keys()].map((x) => ({
-            id: generate({ charset: "alphabetic " }),
-            name: generate({ charset: "alphabetic" }),
+            id: generate({ charset: "alphabetic", readable: true }),
+            name: generate({ charset: "alphabetic", readable: true }),
         }));
 
         const sortedAircrafts = dummyAircrafts.sort((a, b) => {
@@ -216,6 +216,10 @@ describe("root-connections", () => {
                 id
                 name
               }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
             }
           }
         }
@@ -255,6 +259,10 @@ describe("root-connections", () => {
                     cursor: expect.any(String),
                     node,
                 })),
+                pageInfo: {
+                    hasNextPage: true,
+                    endCursor: "YXJyYXljb25uZWN0aW9uOjk=",
+                },
             });
         } finally {
             await session.run(`
