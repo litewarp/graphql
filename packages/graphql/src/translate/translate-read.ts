@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Integer } from "neo4j-driver";
+import { Integer, int } from "neo4j-driver";
 import { cursorToOffset } from "graphql-relay";
 import { Node } from "../classes";
 import createProjectionAndParams from "./create-projection-and-params";
@@ -141,7 +141,7 @@ function translateRead({
             const offset = cursorToOffset(afterInput) + 1;
             if (offset && offset !== 0) {
                 offsetStr = `SKIP $${varName}_offset`;
-                cypherParams[`${varName}_offset`] = offset;
+                cypherParams[`${varName}_offset`] = int(offset);
             }
         }
 
