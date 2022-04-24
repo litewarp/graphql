@@ -1,6 +1,6 @@
 {
-    "name": "@neo4j/graphql-ogm",
-    "version": "3.1.0",
+    "name": "@litewarp/graphql-ogm",
+    "version": "3.1.2",
     "description": "GraphQL powered OGM for Neo4j and Javascript applications",
     "keywords": [
         "neo4j",
@@ -9,9 +9,9 @@
     ],
     "license": "Apache-2.0",
     "bugs": {
-        "url": "https://github.com/neo4j/graphql/issues"
+        "url": "https://github.com/litewarp/graphql/issues"
     },
-    "homepage": "https://github.com/neo4j/graphql/tree/dev/packages/ogm",
+    "homepage": "https://github.com/litewarp/graphql/tree/dev/packages/ogm",
     "exports": "./dist/index.js",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
