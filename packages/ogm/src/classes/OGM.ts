@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-import { Neo4jGraphQL, Neo4jGraphQLConstructor, Node } from "@neo4j/graphql";
+import { Neo4jGraphQL, Neo4jGraphQLConstructor, Node } from "@litewarp/graphql";
 import { GraphQLSchema } from "graphql";
 import Model from "./Model";
 import { filterDocument } from "../utils";
