@@ -6,6 +6,7 @@
         "sourceMap": true,
         "resolveJsonModule": true,
         // TODO Refactor so that noImplicitAny is no longer needed
-        "noImplicitAny": false
+        "noImplicitAny": false,
+        "preserveSymlinks": true
     }
 }
