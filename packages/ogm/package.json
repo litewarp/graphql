@@ -1,6 +1,6 @@
 {
     "name": "@litewarp/graphql-ogm",
-    "version": "3.1.3",
+    "version": "3.1.4",
     "description": "GraphQL powered OGM for Neo4j and Javascript applications",
     "keywords": [
         "neo4j",
