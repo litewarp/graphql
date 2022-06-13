@@ -107,7 +107,7 @@ function getNodes(definitionNodes: DefinitionNodes, options: { callbacks?: Neo4j
 
         let nodeDirective: NodeDirective;
         if (nodeDirectiveDefinition) {
-            nodeDirective = parseNodeDirective(nodeDirectiveDefinition, definition);
+            nodeDirective = parseNodeDirective(nodeDirectiveDefinition);
         }
 
         const nodeFields = getObjFieldMeta({
@@ -190,7 +190,7 @@ function getNodes(definitionNodes: DefinitionNodes, options: { callbacks?: Neo4j
 
         if (globalIdFields.length > 1) {
             throw new Error(
-                "Only one field may be decorated with an '@id' directive where the global argument is set to true"
+                "Only one field may be decorated with an '@id' directive with the global argument set to `true`"
             );
         }
 
@@ -228,8 +228,9 @@ function getNodes(definitionNodes: DefinitionNodes, options: { callbacks?: Neo4j
             fulltextDirective,
             queryOptionsDirective,
             description: definition.description?.value,
-            globalIdField: globalIdField?.fieldName,
             isGlobalNode: Boolean(globalIdField),
+            globalIdField: globalIdField?.fieldName,
+            globalIdFieldIsInt: globalIdField?.typeMeta?.name === "Int",
         });
 
         return node;
